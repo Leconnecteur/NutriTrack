@@ -34,3 +34,38 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+# NutriTrack
+
+NutriTrack est une application web moderne permettant aux utilisateurs de suivre leurs calories consommées, gérer leur menu sur 7 jours et visualiser leurs données nutritionnelles avec des graphiques interactifs.
+
+## Fonctionnalités
+
+- Suivi des calories consommées et restantes
+- Gestion de menu sur 7 jours (saisie manuelle ou génération automatique via ChatGPT)
+- Authentification utilisateur (email/password + Google login)
+- Dashboard interactif avec graphiques et statistiques
+- Interface moderne avec animations fluides
+
+## Technologies utilisées
+
+- Frontend : Next.js avec TailwindCSS
+- Base de données : Firebase Firestore
+- Authentification : Firebase Authentication
+- Backend & automatisation : Firebase Cloud Functions
+- Graphiques & stats : Chart.js
+- Animations : Framer Motion
+
+## Configuration Firebase
+
+Pour faire fonctionner ce projet, vous devez créer un fichier `.env.local` à la racine du projet avec les variables suivantes :
+
+```
+NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+NEXT_PUBLIC_OPENAI_API_KEY=your_openai_api_key (optionnel, pour la génération de menus)
+```
