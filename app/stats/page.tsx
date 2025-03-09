@@ -8,21 +8,9 @@ import { auth, db } from '../lib/firebase';
 import { motion } from 'framer-motion';
 import Header from '../components/Header';
 import Navigation from '../components/Navigation';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
-import { Line, Bar, Doughnut } from 'react-chartjs-2';
-
-// Register ChartJS components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement
-);
+// import de Chart.js retiré car nous utilisons notre adaptateur personnalisé
+// Importation de notre adaptateur de graphiques au lieu de react-chartjs-2
+import ChartAdapter from '../components/ChartAdapter';
 
 // Animation variants
 const containerVariants = {
@@ -394,7 +382,7 @@ const StatsPage = () => {
               <motion.div variants={itemVariants} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
                 <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">Évolution des calories</h3>
                 <div className="h-64">
-                  <Line options={chartOptions} data={prepareCaloriesChartData()} />
+                  <ChartAdapter.Line options={chartOptions} data={prepareCaloriesChartData()} />
                 </div>
               </motion.div>
 
@@ -402,14 +390,14 @@ const StatsPage = () => {
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
                   <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">Répartition des macronutriments</h3>
                   <div className="h-64">
-                    <Bar options={chartOptions} data={prepareMacroChartData()} />
+                    <ChartAdapter.Bar options={chartOptions} data={prepareMacroChartData()} />
                   </div>
                 </div>
 
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
                   <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">Distribution par type de repas</h3>
                   <div className="h-64">
-                    <Doughnut options={doughnutOptions} data={prepareMealTypeData()} />
+                    <ChartAdapter.Doughnut options={doughnutOptions} data={prepareMealTypeData()} />
                   </div>
                 </div>
               </motion.div>
