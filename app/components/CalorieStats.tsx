@@ -2,10 +2,32 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title } from 'chart.js';
-import { Doughnut, Line } from 'react-chartjs-2';
+import dynamic from 'next/dynamic';
 
-ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title);
+// Import Chart.js components dynamiquement pour éviter les erreurs SSR
+const DynamicDoughnut = dynamic(
+  () => import('react-chartjs-2').then((mod) => mod.Doughnut),
+  { ssr: false }
+);
+
+const DynamicLine = dynamic(
+  () => import('react-chartjs-2').then((mod) => mod.Line),
+  { ssr: false }
+);
+
+// Import et enregistrement de Chart.js uniquement côté client
+const registerChartJS = () => {
+  if (typeof window !== 'undefined') {
+    import('chart.js').then(({ Chart, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title }) => {
+      Chart.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title);
+    });
+  }
+};
+
+// Enregistre Chart.js au chargement du composant
+useEffect(() => {
+  registerChartJS();
+}, []);
 
 interface CalorieStatsProps {
   dailyGoal: number;
@@ -137,7 +159,9 @@ const CalorieStats = ({ dailyGoal, consumed, planned = 0, weeklyData = [] }: Cal
         {/* Section du graphique en anneau - toujours visible sur mobile */}
         <div className="w-full flex flex-col items-center">
           <div className="relative w-48 h-48 md:w-56 md:h-56">
-            <Doughnut data={doughnutData} options={doughnutOptions} />
+            {typeof window !== 'undefined' && (
+              <DynamicDoughnut data={doughnutData} options={doughnutOptions} />
+            )}
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span className={`text-3xl font-bold ${consumed + planned > dailyGoal ? 'text-red-500' : 'text-gray-800 dark:text-white'}`}>
                 {percentage}%
@@ -172,7 +196,9 @@ const CalorieStats = ({ dailyGoal, consumed, planned = 0, weeklyData = [] }: Cal
         {/* Graphique en ligne - s'adapte en hauteur sur mobile */}
         <div className="w-full h-60 mt-4">
           <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2 text-center">Historique de la semaine</h3>
-          <Line data={lineData} options={lineOptions} />
+          {typeof window !== 'undefined' && (
+            <DynamicLine data={lineData} options={lineOptions} />
+          )}
         </div>
       </div>
     </div>
