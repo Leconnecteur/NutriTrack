@@ -39,6 +39,7 @@ interface UserData {
   activityLevel?: string;
   fitnessGoal?: string;
   dailyCaloriesGoal?: number;
+  dailyProteinGoal?: number;
   email?: string;
   createdAt?: string;
 }
@@ -154,6 +155,35 @@ const ProfilePage = () => {
     const calories = Math.round(bmr * activityMultiplier * goalFactor);
     return isNaN(calories) ? 0 : calories; // Vérification finale pour éviter NaN
   };
+  
+  const calculateDailyProtein = () => {
+    if (!editedData?.weight) return 0;
+    
+    // Facteurs de protéines basés sur le niveau d'activité (grammes par kg de poids corporel)
+    const proteinFactors: Record<string, number> = {
+      sedentary: 1.6,  // Même sédentaire, besoin d'un apport suffisant
+      light: 1.8,      // Activité légère
+      moderate: 2.0,   // Activité modérée
+      active: 2.2,     // Personne active
+      very_active: 2.4 // Personne très active
+    };
+    
+    // Ajustement en fonction de l'objectif fitness
+    const goalFactors: Record<string, number> = {
+      weightLoss: 1.2,       // Perte de poids - besoin de plus de protéines pour préserver la masse musculaire
+      maintenance: 1.0,      // Maintien
+      muscleGain: 1.2,       // Prise de muscle
+      extremeGain: 1.1       // Prise de masse importante
+    };
+    
+    const { weight, activityLevel, fitnessGoal } = editedData;
+    
+    const baseFactor = proteinFactors[activityLevel || 'moderate'] || 2.0;
+    const goalFactor = goalFactors[fitnessGoal || 'maintenance'] || 1.0;
+    
+    const protein = Math.round(weight * baseFactor * goalFactor);
+    return isNaN(protein) ? 0 : protein;
+  };
 
   const handleSave = async () => {
     if (!user || !editedData) return;
@@ -163,20 +193,23 @@ const ProfilePage = () => {
       setSuccessMessage('');
       setErrorMessage('');
       
-      // Calculate daily calories goal
+      // Calculate daily goals
       const dailyCaloriesGoal = calculateDailyCalories();
+      const dailyProteinGoal = calculateDailyProtein();
       
       // Update user data in Firestore
       const userDocRef = doc(db, 'users', user.uid);
       await updateDoc(userDocRef, {
         ...editedData,
         dailyCaloriesGoal,
+        dailyProteinGoal,
       });
       
       // Update local state
       setUserData({
         ...editedData,
         dailyCaloriesGoal,
+        dailyProteinGoal,
       });
       
       setSuccessMessage('Profil mis à jour avec succès');

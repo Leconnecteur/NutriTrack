@@ -132,10 +132,11 @@ const CalorieStats = ({ dailyGoal, consumed, planned = 0, weeklyData = [] }: Cal
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="w-full md:w-1/3 flex flex-col items-center">
-          <div className="relative w-48 h-48">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6">
+      <div className="flex flex-col items-center justify-between gap-6">
+        {/* Section du graphique en anneau - toujours visible sur mobile */}
+        <div className="w-full flex flex-col items-center">
+          <div className="relative w-48 h-48 md:w-56 md:h-56">
             <Doughnut data={doughnutData} options={doughnutOptions} />
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span className={`text-3xl font-bold ${consumed + planned > dailyGoal ? 'text-red-500' : 'text-gray-800 dark:text-white'}`}>
@@ -144,7 +145,7 @@ const CalorieStats = ({ dailyGoal, consumed, planned = 0, weeklyData = [] }: Cal
               <span className="text-sm text-gray-600 dark:text-gray-300">consommées</span>
             </div>
           </div>
-          <div className="mt-4 text-center">
+          <div className="mt-4 text-center w-full">
             <div className="grid grid-cols-3 gap-2">
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Consommées</p>
@@ -168,8 +169,9 @@ const CalorieStats = ({ dailyGoal, consumed, planned = 0, weeklyData = [] }: Cal
           </div>
         </div>
         
-        <div className="w-full md:w-2/3 h-60">
-          <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2 text-center md:text-left">Historique de la semaine</h3>
+        {/* Graphique en ligne - s'adapte en hauteur sur mobile */}
+        <div className="w-full h-60 mt-4">
+          <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2 text-center">Historique de la semaine</h3>
           <Line data={lineData} options={lineOptions} />
         </div>
       </div>

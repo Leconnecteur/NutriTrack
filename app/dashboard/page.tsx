@@ -15,10 +15,12 @@ interface UserData {
   firstName: string;
   lastName: string;
   dailyCaloriesGoal?: number;
+  dailyProteinGoal?: number;
   age?: number;
   weight?: number;
   height?: number;
   activityLevel?: string;
+  fitnessGoal?: string;
   email?: string;
   createdAt?: string;
   gender?: string;
@@ -78,6 +80,36 @@ export default function Dashboard() {
     const activityLevel = data.activityLevel || 'moderate';
     const multiplier = activityMultipliers[activityLevel] || 1.55;
     return Math.round(bmr * multiplier);
+  };
+  
+  // Calculer l'objectif de protéines quotidiennes en fonction du poids et du niveau d'activité
+  const calculateDailyProtein = (data: UserData): number => {
+    if (!data.weight) return 120; // Valeur par défaut si pas de poids
+    
+    // Facteurs de protéines basés sur le niveau d'activité (grammes par kg de poids corporel)
+    const proteinFactors: Record<string, number> = {
+      sedentary: 1.6,  // Même sédentaire, besoin d'un apport suffisant
+      light: 1.8,      // Activité légère
+      moderate: 2.0,   // Activité modérée
+      active: 2.2,     // Personne active
+      veryActive: 2.4  // Personne très active
+    };
+    
+    // Ajustement en fonction de l'objectif fitness
+    const goalFactors: Record<string, number> = {
+      weightLoss: 1.2,       // Perte de poids - besoin de plus de protéines pour préserver la masse musculaire
+      maintenance: 1.0,      // Maintien
+      muscleGain: 1.2,       // Prise de muscle
+      performance: 1.1       // Performance
+    };
+    
+    const activityLevel = data.activityLevel || 'moderate';
+    const fitnessGoal = data.fitnessGoal || 'maintenance';
+    
+    const baseFactor = proteinFactors[activityLevel] || 2.0;
+    const goalFactor = goalFactors[fitnessGoal] || 1.0;
+    
+    return Math.round(data.weight * baseFactor * goalFactor);
   };
 
   // Fonction pour récupérer les repas du jour
@@ -253,6 +285,9 @@ export default function Dashboard() {
 
   // Déterminer une valeur par défaut pour dailyCaloriesGoal si elle n'existe pas
   const dailyCaloriesGoal = userData.dailyCaloriesGoal || 2000;
+  
+  // Calculer l'objectif de protéines
+  const dailyProteinGoal = calculateDailyProtein(userData);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
@@ -298,7 +333,7 @@ export default function Dashboard() {
               className="bg-orange-500 dark:bg-orange-600 text-white rounded-lg p-6 shadow-sm"
             >
               <h3 className="text-xl font-bold mb-2">Protéines</h3>
-              <p className="text-3xl font-bold">120 <span className="text-sm">g</span></p>
+              <p className="text-3xl font-bold">{dailyProteinGoal} <span className="text-sm">g</span></p>
               <p className="text-sm opacity-80">Objectif quotidien</p>
             </motion.div>
           </div>
