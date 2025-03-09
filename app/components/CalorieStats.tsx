@@ -2,13 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import dynamic from 'next/dynamic';
-
-// Import dynamique des composants de Chart.js pour éviter les erreurs SSR
-const DynamicCharts = dynamic(
-  () => import('./DynamicCharts'),
-  { ssr: false }
-);
 
 interface CalorieStatsProps {
   dailyGoal: number;
@@ -134,13 +127,38 @@ const CalorieStats = ({ dailyGoal, consumed, planned = 0, weeklyData = [] }: Cal
     maintainAspectRatio: false,
   };
 
+  // État pour suivre si le composant est monté côté client ou non
+  const [isClient, setIsClient] = useState(false);
+
+  // Détection du côté client
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Importation dynamique des graphiques uniquement côté client
+  useEffect(() => {
+    if (isClient) {
+      import('./DynamicCharts');
+    }
+  }, [isClient]);
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6">
       <div className="flex flex-col items-center justify-between gap-6">
         {/* Section du graphique en anneau - toujours visible sur mobile */}
         <div className="w-full flex flex-col items-center">
           <div className="relative w-48 h-48 md:w-56 md:h-56">
-            <DynamicCharts.Doughnut data={doughnutData} options={doughnutOptions} />
+            {/* Placeholder du graphique en attendant le chargement côté client */}
+            {!isClient ? (
+              <div className="w-full h-full rounded-full border-4 border-gray-200 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="animate-pulse mb-2 bg-gray-300 h-8 w-16 mx-auto rounded"></div>
+                  <div className="text-gray-400">Chargement...</div>
+                </div>
+              </div>
+            ) : (
+              <div id="doughnut-container" className="w-full h-full"></div>
+            )}
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span className={`text-3xl font-bold ${consumed + planned > dailyGoal ? 'text-red-500' : 'text-gray-800 dark:text-white'}`}>
                 {percentage}%
@@ -175,7 +193,17 @@ const CalorieStats = ({ dailyGoal, consumed, planned = 0, weeklyData = [] }: Cal
         {/* Graphique en ligne - s'adapte en hauteur sur mobile */}
         <div className="w-full h-60 mt-4">
           <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2 text-center">Historique de la semaine</h3>
-          <DynamicCharts.Line data={lineData} options={lineOptions} />
+          {!isClient ? (
+            <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg">
+              <div className="text-center">
+                <div className="animate-pulse mb-2 bg-gray-300 h-4 w-32 mx-auto rounded"></div>
+                <div className="animate-pulse mb-2 bg-gray-300 h-4 w-24 mx-auto rounded"></div>
+                <div className="text-gray-400">Chargement de l'historique...</div>
+              </div>
+            </div>
+          ) : (
+            <div id="line-container" className="w-full h-full"></div>
+          )}
         </div>
       </div>
     </div>
