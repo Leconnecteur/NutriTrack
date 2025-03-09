@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useDoughnutChart, useLineChart } from './SimpleCharts';
+import { createDoughnutChart, createLineChart } from './SimpleCharts';
 
 interface CalorieStatsProps {
   dailyGoal: number;
@@ -142,14 +142,19 @@ const CalorieStats = ({ dailyGoal, consumed, planned = 0, weeklyData = [] }: Cal
     value: item.calories
   }));
   
-  // Utiliser useEffect pour appliquer les hooks de graphiques
+  // Utiliser useEffect pour créer les graphiques directement
   useEffect(() => {
     if (isClient) {
-      // Créer le graphique circulaire
-      useDoughnutChart('doughnut-container', percentage, consumed + planned > dailyGoal ? '#ef4444' : '#3b82f6');
+      // Petit délai pour s'assurer que le DOM est prêt
+      const timer = setTimeout(() => {
+        // Créer le graphique circulaire
+        createDoughnutChart('doughnut-container', percentage, consumed + planned > dailyGoal ? '#ef4444' : '#3b82f6');
+        
+        // Créer le graphique linéaire
+        createLineChart('line-container', lineChartData, 'Calories');
+      }, 100);
       
-      // Créer le graphique linéaire
-      useLineChart('line-container', lineChartData, 'Calories');
+      return () => clearTimeout(timer);
     }
   }, [isClient, percentage, consumed, planned, dailyGoal, lineChartData]);
 

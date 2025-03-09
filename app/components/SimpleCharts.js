@@ -1,7 +1,5 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-
 // Fonction pour créer un graphique circulaire simple avec le pourcentage au centre
 export function createDoughnutChart(containerId, percentage, color = '#3b82f6') {
   // S'assurer que nous sommes côté client
@@ -134,34 +132,3 @@ export function createLineChart(containerId, data, label) {
     ctx.fillText(point.value.toString(), point.x, point.y - 10);
   });
 }
-
-// Hook pour créer un graphique circulaire
-export function useDoughnutChart(containerId, percentage, color) {
-  useEffect(() => {
-    // Petit délai pour s'assurer que le DOM est prêt
-    const timer = setTimeout(() => {
-      createDoughnutChart(containerId, percentage, color);
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  }, [containerId, percentage, color]);
-}
-
-// Hook pour créer un graphique linéaire
-export function useLineChart(containerId, data, label) {
-  useEffect(() => {
-    // Petit délai pour s'assurer que le DOM est prêt
-    const timer = setTimeout(() => {
-      createLineChart(containerId, data, label);
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  }, [containerId, data, label]);
-}
-
-export default {
-  useDoughnutChart,
-  useLineChart,
-  createDoughnutChart,
-  createLineChart
-};
