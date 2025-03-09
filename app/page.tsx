@@ -3,9 +3,12 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import AuthRedirect from './components/AuthRedirect';
 
 export default function Home() {
   return (
+    <>
+      <AuthRedirect />
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white dark:from-gray-900 dark:to-gray-800 flex flex-col">
       <main className="flex-grow flex flex-col items-center justify-center p-4">
         <motion.div
@@ -100,5 +103,6 @@ export default function Home() {
         </motion.div>
       </main>
     </div>
+    </>
   );
 }
