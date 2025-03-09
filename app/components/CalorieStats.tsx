@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useDoughnutChart, useLineChart } from './SimpleCharts';
 
 interface CalorieStatsProps {
   dailyGoal: number;
@@ -69,7 +70,7 @@ const CalorieStats = ({ dailyGoal, consumed, planned = 0, weeklyData = [] }: Cal
       },
       tooltip: {
         callbacks: {
-          label: function (context) {
+          label: function (context: any) {
             return context.label + ': ' + context.parsed + ' kcal';
           }
         }
@@ -85,7 +86,7 @@ const CalorieStats = ({ dailyGoal, consumed, planned = 0, weeklyData = [] }: Cal
       },
       tooltip: {
         callbacks: {
-          label: function (context) {
+          label: function (context: any) {
             return context.dataset.label + ': ' + context.parsed.y + ' kcal';
           }
         }
@@ -134,13 +135,23 @@ const CalorieStats = ({ dailyGoal, consumed, planned = 0, weeklyData = [] }: Cal
   useEffect(() => {
     setIsClient(true);
   }, []);
-
-  // Importation dynamique des graphiques uniquement côté client
+  
+  // Préparer les données pour le graphique linéaire
+  const lineChartData = weeklyData.map(item => ({
+    label: item.day,
+    value: item.calories
+  }));
+  
+  // Utiliser useEffect pour appliquer les hooks de graphiques
   useEffect(() => {
     if (isClient) {
-      import('./DynamicCharts');
+      // Créer le graphique circulaire
+      useDoughnutChart('doughnut-container', percentage, consumed + planned > dailyGoal ? '#ef4444' : '#3b82f6');
+      
+      // Créer le graphique linéaire
+      useLineChart('line-container', lineChartData, 'Calories');
     }
-  }, [isClient]);
+  }, [isClient, percentage, consumed, planned, dailyGoal, lineChartData]);
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6">
@@ -148,7 +159,6 @@ const CalorieStats = ({ dailyGoal, consumed, planned = 0, weeklyData = [] }: Cal
         {/* Section du graphique en anneau - toujours visible sur mobile */}
         <div className="w-full flex flex-col items-center">
           <div className="relative w-48 h-48 md:w-56 md:h-56">
-            {/* Placeholder du graphique en attendant le chargement côté client */}
             {!isClient ? (
               <div className="w-full h-full rounded-full border-4 border-gray-200 flex items-center justify-center">
                 <div className="text-center">
@@ -204,6 +214,7 @@ const CalorieStats = ({ dailyGoal, consumed, planned = 0, weeklyData = [] }: Cal
           ) : (
             <div id="line-container" className="w-full h-full"></div>
           )}
+          {/* Les graphiques sont créés via useEffect */}
         </div>
       </div>
     </div>
